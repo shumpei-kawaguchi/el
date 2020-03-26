@@ -47,7 +47,7 @@ sencer sencer[4];
 void setup() {
   String TAG = "setup()";
   Serial.begin(115200);
-  for(int i = 0; i < 6; i++){
+  for(int i = 0; i < 7; i++){
     pinMode(ledList[i],OUTPUT);
   }
   SetPreference();
