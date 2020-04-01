@@ -1,5 +1,5 @@
 /*
- * @Eremiru
+ * @Elemiru
  * Copyright 2020 Shumpei Kawaguchi. All rights reserved.
  *
  * This source code or any portion thereof must not be  
