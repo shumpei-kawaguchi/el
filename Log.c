@@ -1,21 +1,28 @@
-
+/*
+ * @Eremiru
+ * Copyright 2020 Shumpei Kawaguchi. All rights reserved.
+ *
+ * This source code or any portion thereof must not be  
+ * reproduced or used in any manner whatsoever.
+ */
 void SystemPrint(String TAG,String msg){
-  Serial.println( "[S][" + TAG + "]:" + msg);
+  Serial.println( "[S][ " + TAG + " ]:" + msg);
 }
 
 void IoPrint(int mode) {
   Serial.print( "[i]");
-  Serial.print("[io:" + String(sencer[mode].io));
-  if(sencer[mode].inProgress){
-    Serial.print(",inProgress");
-  }
+  Serial.print(" io:" + String(Io(mode)));
+  
   if(sencer[mode].isChecking){
-    Serial.print(",isChecking");
+    Serial.print(" isChecking");
   }
-  Serial.print("\nstage:" + String(sencer[mode].stage));
-  Serial.print(",average:" + String(sencer[mode].average));
-  Serial.print(",bufAverage:" + String(sencer[mode].bufAverage));
-  Serial.print(",count:" + String(sencer[mode].count));
-  Serial.print(",bufcount:" + String(sencer[mode].bufCount));
-  Serial.print(",timeOut:" + String(sencer[mode].timeOut));
+  Serial.print("---->");
+  Serial.print("stage:" + String(sencer[mode].stage));
+  Serial.print(",count:" + String(data[mode].count));
+  Serial.print(",sum:" + String(data[mode].sum));
+  Serial.print(",average:" + String(data[mode].average));  
+  Serial.print(",bufcount:" + String(bufData[mode].count));
+  Serial.print(",bufSum:" + String(bufData[mode].sum));
+  Serial.print(",bufAverage:" + String(bufData[mode].average));
+  Serial.println(",timeOut:" + String(sencer[mode].timeOut));
 }

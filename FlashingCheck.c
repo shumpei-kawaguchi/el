@@ -1,8 +1,14 @@
+/*
+ * @Eremiru
+ * Copyright 2020 Shumpei Kawaguchi. All rights reserved.
+ *
+ * This source code or any portion thereof must not be  
+ * reproduced or used in any manner whatsoever.
+ */
 void FlashingCheck(int mode){
-  String TAG = "FlashingCheck()";
-  mData = analogRead(sencer[mode].io);
-  SystemPrint(TAG,String(mData) + ":" + String(sencer[mode].position));
-  if (sencer[mode].average - mData > 100) {
+  mData = analogRead(Io(mode));
+  SystemPrint("flashingCheck()",String(mData) + ":" + Position(mode));
+  if (data[mode].average - mData > 100) {
     OverAverage(mode);
   }
   else {
@@ -10,10 +16,8 @@ void FlashingCheck(int mode){
   }
 }
 
-void OverAverage(int mode){
-  String TAG = "OverAverage()";
-  
-  SystemPrint(TAG,String(sencer[mode].stage));
+void OverAverage(int mode){  
+  SystemPrint("overAverage()",String(data[mode].average - mData));
 
   if (sencer[mode].isChecking){
     
@@ -22,27 +26,32 @@ void OverAverage(int mode){
     }
     else if (sencer[mode].stage == 1) {
       if (TimeOutCheck(mode) == TIME_OUT) {
-        sencer[mode].stage = 0;
+        PushAverage(mode);
       }
       else {
-        sencer[mode].timeOut++;
+        MakeBufAverage(mode);
       }
     }
     else {
+      sencer[mode].timeOut = 0;
+      sencer[mode].isChecking = false;
       FirebaseDataSend(mode);
+      sencer[mode].stage = 0;
     }
   }
   else{
-    if (TimeOutCheck(mode) != TIME_OUT){
-      sencer[mode].timeOut++;
-      sencer[mode].stage = 1;
-    }
+    if (TimeOutCheck(mode) == TIME_OUT) {
+        PushAverage(mode);
+      }
+      else {
+        MakeBufAverage(mode);
+        sencer[mode].stage = 1;
+      }
   }
 }
 
 void UnderAverage(int mode){
-  String TAG = "UnderAverage()";
-  SystemPrint(TAG,String(sencer[mode].stage));
+  SystemPrint("underAverage()",String(data[mode].average - mData));
   
   if (sencer[mode].isChecking){
     
@@ -80,6 +89,7 @@ int TimeOutCheck(int mode) {
     if(!sencer[mode].isChecking) {
       sencer[mode].isChecking = true;
     }
+    SystemPrint("TimeOutCheck()","TIME_OUT");
     return TIME_OUT;
   }
   else {

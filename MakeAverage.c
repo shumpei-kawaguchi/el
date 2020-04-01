@@ -1,62 +1,75 @@
+/*
+ * @Eremiru
+ * Copyright 2020 Shumpei Kawaguchi. All rights reserved.
+ *
+ * This source code or any portion thereof must not be  
+ * reproduced or used in any manner whatsoever.
+ */
 void MakeAverage(int mode) {
-  String TAG = "makeAverage()";
-  
-  int sum = 0;
-  sencer[mode].dataList[sencer[mode].count] = mData;
- 
-  for (int i = 0; i < LIMIT; i++) {
-      sum += sencer[mode].dataList[i];
-  }
 
-  sencer[mode].count++;
+  int count = data[mode].count;
+  int sum = data[mode].sum;
+  int average = 0;
 
-  if (!sencer[mode].inProgress){
-    sencer[mode].average = sum / sencer[mode].count; 
+  count++;
+
+  if ( count < 100 ) {
+    sum += mData;
+    data[mode].dataList[count] = mData;
+    average = sum / count;
   }
   else {
-    sencer[mode].average = sum / LIMIT;
+    if( count > 199 ) count -= 100;
+    sum += ( mData - data[mode].dataList[count - 100] );
+    data[mode].dataList[count - 100] = mData;
+    average = sum / 100;
   }
-  
-  if (sencer[mode].count >= LIMIT) {
-    if (!sencer[mode].inProgress){
-      sencer[mode].inProgress = true;
-    }
-    sencer[mode].count -= LIMIT;
-  }
+
+  data[mode].count = count;
+  data[mode].sum = sum;
+  data[mode].average = average;
 }
 
 void MakeBufAverage(int mode) {
-  String TAG = "makeBufAverage()";
 
-  int sum = 0;
-          
-  sencer[mode].bufCount = sencer[mode].count + sencer[mode].timeOut;
-  sencer[mode].bufDataList[sencer[mode].bufCount] = mData;
+  int sum = bufData[mode].sum;
   
-  for (int i = 0; i < LIMIT; i++) {
-    sencer[mode].bufDataList[i] = sencer[mode].dataList[i];
-    sum += sencer[mode].bufDataList[i];
+  if(sencer[mode].timeOut == 0){
+    sum = 0;
+    for (int i = 0; i < LIMIT; i++) {
+      bufData[mode].dataList[i] = data[mode].dataList[i];
+      sum += bufData[mode].dataList[i];
+    }
   }
-
+  
   sencer[mode].timeOut++;
 
-  if (!sencer[mode].inProgress && sencer[mode].bufCount <= LIMIT) {
-    sencer[mode].bufAverage = sum / sencer[mode].bufCount;
+  int count = data[mode].count + sencer[mode].timeOut;
+  int average = 0;
+
+  if ( count < 100 ) {
+    sum += mData;
+    bufData[mode].dataList[count] = mData;
+    average = sum / count;
   }
   else {
-    sencer[mode].bufAverage = sum / LIMIT;
+    if( count > 199 ) count -= 100;
+    sum += ( mData - bufData[mode].dataList[count - 100] );
+    bufData[mode].dataList[count - 100] = mData;
+    average = sum / 100;
   }
-  if (sencer[mode].bufCount >= LIMIT) {
-    sencer[mode].bufCount -= LIMIT;
-  }
+
+  bufData[mode].count = count;
+  bufData[mode].sum = sum;
+  bufData[mode].average = average;
+  
 }
 
 void PushAverage(int mode) {
-  String TAG = "makeBufAverage()";
   for (int i = 0; i < LIMIT; i++) {
-    sencer[mode].dataList[i] = sencer[mode].bufDataList[i];
+    data[mode].dataList[i] = bufData[mode].dataList[i];
   }
-  sencer[mode].bufDataList[100] = {};
-  sencer[mode].average = sencer[mode].bufAverage;
-  sencer[mode].count = sencer[mode].bufCount;
+  data[mode].sum = bufData[mode].sum;
+  data[mode].average = bufData[mode].average;
+  data[mode].count = bufData[mode].count;
 }

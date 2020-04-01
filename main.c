@@ -1,71 +1,72 @@
+/*
+ * @Eremiru
+ * Copyright 2020 Shumpei Kawaguchi. All rights reserved.
+ *
+ * This source code or any portion thereof must not be  
+ * reproduced or used in any manner whatsoever.
+ */
 #include <WiFi.h>
 #include <WiFiMulti.h>
 #include <WiFiClientSecure.h>
+
+WiFiClientSecure client;
+WiFiMulti wifiMulti;
 
 #define LIMIT 100
 #define TIME_OUT 5
 
 #define LEVEL 1
-#define POSITION "R" //R or L
+#define POSITION "L" //R or L
 #define TEST false
 
-int mData;
-int ledList[7] = {0,4,16,17,5,18,19};
+#define RIGHT "Right"
+#define LEFT "Left"
+#define CENTER "Center"
 
-struct preference {
-  const char* ssid;
-  const char* password;
-  int mode;
-  int io[4];
-  String position[4];
-  String dir[4];
-};
+#define UP "UP"
+#define DOWN "DOWN"
+
+int mData;
+const int io[6] = {32,33,34,35,36,39};
+const int ledList[7] = {0,4,16,17,5,18,19};
 
 struct sencer {
-  int io;
-  String position;
-  String dir;
-  boolean inProgress;
   boolean isChecking;
   int stage;
-  int count;
-  int dataList[100];
-  int average;
-  int bufCount;
-  int bufDataList[100];
-  int bufAverage;
   int timeOut;
 };
-
-WiFiClientSecure client;
-WiFiMulti wifiMulti;
-
-preference preference;
 sencer sencer[4];
+
+typedef struct data {
+  int count;
+  int dataList[100];
+  int sum;
+  int average;
+};
+
+struct data data[4];
+struct data bufData[4];
 
 
 void setup() {
-  String TAG = "setup()";
   Serial.begin(115200);
-  for(int i = 0; i < 6; i++){
+  for(int i = 0; i < 7; i++){
     pinMode(ledList[i],OUTPUT);
   }
-  SetPreference();
   Init();
   WifiConnect();
-  SystemPrint(TAG,"END");
+  SystemPrint("setup()","END");
 }
 
 void loop() {
-  String TAG = "loop()";
-
+  SystemPrint("loop()",F("====================================="));
   if(WiFi.status() != WL_CONNECTED){
     WifiConnect();
-  }else{
-    SystemPrint(TAG,"WIFI DISCONNECTED");
   }
+
+  int m = Mode();
   
-  for(int mode = 0; mode < preference.mode; mode++) {
+  for(int mode = 0; mode < m; mode++) {
     int stage = sencer[mode].stage;
     
     FlashingCheck(mode);
@@ -73,11 +74,9 @@ void loop() {
     if(stage != sencer[mode].stage){
       sencer[mode].timeOut = 0;
     }
-    
-    IoStatus(sencer[mode].stage, sencer[mode].position);
     IoPrint(mode);
-    
+    IoStatus(sencer[mode].stage, Position(mode));
   }
-  SystemPrint(TAG,"END");
-  delay(100);
+  SystemPrint("loop()","END");
+  delay(100/m);
 }

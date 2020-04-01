@@ -1,65 +1,50 @@
-
+/*
+ * @Eremiru
+ * Copyright 2020 Shumpei Kawaguchi. All rights reserved.
+ *
+ * This source code or any portion thereof must not be  
+ * reproduced or used in any manner whatsoever.
+ */
 void WifiConnect(){
-  String TAG = "WifiConnect()";
   AllOff();
   WiFi.disconnect(true);
   delay(10);
-  SetWifiPass();
-  wifiMulti.addAP(preference.ssid, preference.password);
-  SystemPrint(TAG,String(preference.ssid));
+  wifiMulti.addAP(GetSSID(), GetPASS());
   Serial.print("WiFi connecting");
   while (wifiMulti.run() != WL_CONNECTED) {
     Serial.print(".");
     delay(1);
   }
    Serial.println();
-  SystemPrint(TAG,"WiFi connected: " + String(WiFi.SSID()));
+  SystemPrint("WifiConnect()","WiFi connected: " + String(WiFi.SSID()));
   digitalWrite(0,1);
-  SystemPrint(TAG,"END");
+  SystemPrint("WifiConnect()","END");
 }
 
-void SetWifiPass(){
-  String TAG = "SetWifiPass()";
+const char* GetSSID(){
   if(TEST){
-    preference.ssid = "ssid";
-    preference.password = "pass";
+    return "ssid1";
   }else{
     if(LEVEL == 1){
-      preference.ssid = "ssid";
-      preference.password = "ssid";
+      return "ssid2";
     }
     else if(LEVEL == 2){
-      preference.ssid = "ssid";
-      preference.password = "pass";
-    }
-    else if(LEVEL == 3){
-      preference.ssid = "ssid";
-      preference.password = "pass";
-    }
-    else if(LEVEL == 4){
-      preference.ssid = "ssid";
-      preference.password = "pass";
-    }
-    else if(LEVEL == 5){
-      preference.ssid = "ssid";
-      preference.password = "pass";
-    }
-    else if(LEVEL == 6){
-      preference.ssid = "ssid";
-      preference.password = "pass";
-    }
-    else if(LEVEL == 7){
-      preference.ssid = "ssid";
-      preference.password = "pass";
-    }
-    else if(LEVEL == 8){
-      preference.ssid = "ssid";
-      preference.password = "pass";
-    }
-    else if(LEVEL == 9){
-      preference.ssid = "ssid";
-      preference.password = "pass";
+      return "ssid3";
     }
   }
-  SystemPrint(TAG,"END");
+}
+
+
+const char* GetPASS(){
+  if(TEST){
+    return "pass1";
+  }else{
+    if(LEVEL == 1){
+      return "pass2";
+    }
+    else if(LEVEL == 2){
+      return "pass3";
+    }
+
+  }
 }
